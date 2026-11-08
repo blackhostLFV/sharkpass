@@ -19,7 +19,7 @@ El sitio permite indexación solo en páginas públicas de producción; cuentas,
 
 ## Validación
 
-- npm run check: 92 pruebas aprobadas, incluyendo concurrencia HTTP, idempotencia, aislamiento de permisos, escaneo único, reservas, aprobación tardía, cortesías ocultas, bloqueo de 30 sillas, registro nominal y migración de compras existentes con respaldo verificado.
+- npm run check: 94 pruebas aprobadas, incluyendo concurrencia HTTP, idempotencia, aislamiento de permisos, escaneo único, reservas, aprobación tardía, cortesías ocultas, bloqueo de 30 sillas, registro nominal y migración de compras existentes con respaldo verificado.
 - npm run build: exportación Android, iOS y web aprobada.
 - Contenedor de servidor: construcción y arranque con src/hostinger.mjs aprobados; health correcto con servicios desactivados en el contenedor aislado.
 - Navegación local: selección de silla, carrito, registro por asistente, términos, pago simulado exclusivamente local y QR con silla. Mapa comprobado en 390 y 320 px, sin desbordamiento global y con 30 sillas deshabilitadas.
@@ -31,3 +31,7 @@ La configuración de producción no equivale a una compra real aprobada. Falta u
 ## Presentación pública
 
 Banner conceptual panorámico y tarjeta de tiburón separada del afiche oficial. Imágenes optimizadas, información de precios en HTML, revisión en escritorio y móvil sin desbordamiento global. El repositorio público incluye una guía para evaluación y los límites del alcance offline.
+
+## Ajustes de disponibilidad y navegación
+
+A petición del propietario, las sillas asignadas muestran una banda visual «Vendida» y mantienen el número legible encima. Las reservas temporales indican «Reservada». La etiqueta visual no crea pagos, ingresos ni tickets; el bloqueo del servidor permanece vigente. Se conserva un único acceso «Ingresar» junto al buscador. El footer agrupa sus enlaces en la franja inferior, con disposición adaptable. Revisión local de estados ocupados, vendidos y reservados con datos DEMO, separación geométrica entre número y banda en 390 px y ausencia de desbordamiento global.

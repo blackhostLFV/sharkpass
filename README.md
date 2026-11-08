@@ -14,7 +14,7 @@ Consulta la [guía de revisión](docs/REVISION_CONVOCATORIA.md), con el alcance 
 
 SharkPass facilita descubrir y comprar entradas para eventos que pueden motivar visitas al Caribe. Una agenda con mayor visibilidad y una compra más sencilla puede generar oportunidades para hoteles, restaurantes, transporte y comercios locales. Este potencial requiere alianzas y medición: no se presentan impactos turísticos o económicos como resultados ya demostrados.
 
-## Estado al 7 de noviembre de 2026
+## Estado al 8 de noviembre de 2026
 
 La web está desplegada en Hostinger. Wompi está configurado en producción y el transporte SMTP está configurado. El evento oficial Shark Caribe está publicado con selección de silla: 50 puestos Preferencial y 50 General; los primeros 30 Preferencial están bloqueados por asignación del organizador. Las 50 cortesías están separadas del catálogo público.
 
@@ -89,7 +89,7 @@ Consulta [el alcance móvil](apps/mobile/README.md). Una exportación de iOS/And
 
 ## Verificación
 
-Última revisión: **92 pruebas aprobadas** con `npm run check`, exportaciones web/iOS/Android con `npm run build` y construcción/arranque del contenedor comprobados. Incluye autorización permitida y denegada, aislamiento de organizadores, compras concurrentes, QR de un uso, callbacks repetidos, reservas vencidas y migraciones que preservan compras existentes.
+Última revisión: **94 pruebas aprobadas** con `npm run check`, exportaciones web/iOS/Android con `npm run build` y construcción/arranque del contenedor comprobados. Incluye autorización permitida y denegada, aislamiento de organizadores, compras concurrentes, QR de un uso, callbacks repetidos, reservas vencidas y migraciones que preservan compras existentes.
 
 ```sh
 npm run check
@@ -111,6 +111,8 @@ Antes de migrar en el arranque administrado se genera un respaldo SQLite y se co
 ## Documentación
 
 - [Guía para evaluadores](docs/REVISION_CONVOCATORIA.md).
+- [Oferta de valor propuesta](docs/propuesta-de-valor.md).
+- [Presentación de organizadores](docs/organizaciones-2026-11-07.md).
 - [Lanzamiento oficial y validación](docs/lanzamiento-oficial-2026-11-07.md).
 - [Escáner PWA](docs/ingreso-pwa.md).
 - [Banner conceptual y prompt](docs/banner-sharkcaribe-2026-11-07.md).

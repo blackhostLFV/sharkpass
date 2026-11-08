@@ -1,6 +1,6 @@
 # Guía de revisión de SharkPass
 
-Estado: 7 de noviembre de 2026. Repositorio público para evaluación técnica. Sitio: https://sharkpass.co/. La revisión de código y las pruebas se pueden ejecutar sin claves comerciales; usar únicamente datos sintéticos. No realizar compras reales en producción como parte de una revisión sin coordinar con el propietario.
+Estado: 8 de noviembre de 2026. Repositorio público para evaluación técnica. Sitio: https://sharkpass.co/. La revisión de código y las pruebas se pueden ejecutar sin claves comerciales; usar únicamente datos sintéticos. No realizar compras reales en producción como parte de una revisión sin coordinar con el propietario.
 
 ## Alcance de los hitos
 
@@ -33,7 +33,7 @@ Estado: 7 de noviembre de 2026. Repositorio público para evaluación técnica. 
 
 ## Evidencia reproducible
 
-Con Node 22.17.1: `npm ci`, `npm run check` y `npm run build`. La revisión actual pasó 92 pruebas; el build exporta los clientes Expo y comprueba sintaxis del servidor. Hay una prueba HTTP concurrente que permite una compra por silla, y una prueba de migración que preserva entradas previas tras crear y abrir un respaldo independiente.
+Con Node 22.17.1: `npm ci`, `npm run check` y `npm run build`. La revisión actual pasó 94 pruebas; el build exporta los clientes Expo y comprueba sintaxis del servidor. Hay una prueba HTTP concurrente que permite una compra por silla, y una prueba de migración que preserva entradas previas tras crear y abrir un respaldo independiente.
 
 Los escenarios de pago en pruebas usan datos y adaptadores sintéticos. No demuestran por sí solos aprobación comercial, entrega a todos los proveedores de correo o rendimiento de un recinto en operación.
 

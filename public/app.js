@@ -1,4 +1,5 @@
-import {mountSeatPicker} from "/seating.js?v=20261107-numbered";
+import {mountOrganizerLanding} from "/organizers.js?v=20261107-organizers-v5";
+import {mountSeatPicker} from "/seating.js?v=20261107-vendida-v5";
 import {mountAdminConsole} from "/admin-console.js?v=20261107-console";
 import {setupMobileNavigation} from "/navigation.js?v=20261107-mobile-nav";
 import { demoEvents } from "/demo-events.js";
@@ -173,7 +174,7 @@ async function loadMe() {
   }
 }
 function heading(title, description) {
-  content.classList.remove("account-workspace","ticket-wallet","orders-workspace","admin-workspace");
+  content.classList.remove("account-workspace","ticket-wallet","orders-workspace","admin-workspace","organizer-marketing");
   stopCheckoutTimers();
   delete document.body.dataset.checkoutAuth;
   window.scrollTo({ top: 0, behavior: "instant" });
@@ -289,7 +290,7 @@ function eventCard(event, compact = false) {
   return card;
 }
 async function events() {
-  content.classList.remove("account-workspace","ticket-wallet","orders-workspace","admin-workspace");
+  content.classList.remove("account-workspace","ticket-wallet","orders-workspace","admin-workspace","organizer-marketing");
   content.replaceChildren(
     document.querySelector("#home-template").content.cloneNode(true),
   );
@@ -1347,19 +1348,11 @@ function eventDraftSteps(f) {
   draw();
 }
 function organizerLanding() {
-  heading("Tu evento merece una gran entrada.", "Desde tu primer encuentro hasta una gran producción. Tú haces que suceda; SharkPass reúne tus entradas y accesos.");
-  const intro = el("section", null, { class: "organizer-landing" });
-  const copy = el("div");
-  copy.append(el("p", "CREADO PARA ORGANIZADORES", { class: "eyebrow" }), el("h2", "Tú creas el momento. Nosotros los tickets."), el("p", "Prepara la información de tu evento, define tipos de entrada y cupos, consulta pedidos y organiza el ingreso de tu equipo."), button("Entrar o crear mi cuenta", () => show("account")));
-  intro.append(copy, el("img", null, { src: "/media/canva-concert.png", alt: "Fotografía ilustrativa de una producción de concierto", width: "635", height: "423" }));
-  const features = el("div", null, { class: "organizer-features" });
-  for (const [title, description] of [["Entradas y cupos", "Prepara los tipos de entrada y su disponibilidad."], ["Control de ingreso", "Valida cada QR con permisos para tu equipo."], ["Pedidos y reportes", "Consulta los pedidos y resultados de tus eventos."], ["Dos formas de organizar", "Autoservicio para tu equipo y operación asistida por coordinar con SharkPass."]]) {
-    const item = el("article", null, { class: "card" });
-    item.append(el("h3", title), el("p", description));
-    features.append(item);
-  }
-  content.append(intro, features, el("p", "Piloto privado: los pagos con Wompi y el envío de correo requieren configuración. Las condiciones de operación asistida y liquidación están pendientes de definir.", { class: "notice" }));
+  heading("Organiza con SharkPass");
+  content.replaceChildren();content.classList.add("organizer-marketing");
+  mountOrganizerLanding(content,{el,button,money,icon:accountIcon,onStart:()=>me?organizer():show("account"),onLogin:()=>show("account")});
 }
+
 async function organizer() {
   if (!me) return organizerLanding();
   await loadMe();
@@ -1367,6 +1360,7 @@ async function organizer() {
     "Haz que suceda.",
     "Organiza tus eventos y gestiona las entradas desde un solo lugar.",
   );
+  content.append(button("Conoce SharkPass para organizadores",()=>organizerLanding(),"secondary"));
   const create = el("section", null, { class: "card" });
   create.append(el("h2", "Crear organizador"));
   const orgForm = form(async (data) => {
@@ -1810,7 +1804,7 @@ async function admin() {
   await loadMe();if(!me)return show("account");
   heading("Administración","Control de eventos, ventas, ingreso y operación de SharkPass.");
   if(!platformAdmin){content.append(el("p","Tu cuenta no tiene permisos de administración. Inicia sesión con la cuenta administradora autorizada.",{class:"notice"}));return;}
-  content.classList.add("admin-workspace");await mountAdminConsole(content,{request,el,button,field,form,fmtDate,money,me});
+  content.classList.add("admin-workspace","organizer-marketing");await mountAdminConsole(content,{request,el,button,field,form,fmtDate,money,me});
 }
 async function show(next) {
   stopCheckoutTimers();
@@ -1829,6 +1823,7 @@ async function show(next) {
   ].includes(next)
     ? next
     : "events";
+  content.classList.remove("organizer-marketing");
   document.body.dataset.view = view;
   delete document.body.dataset.auth;
   for (const item of document.querySelectorAll(
