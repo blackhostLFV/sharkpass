@@ -13,3 +13,5 @@ Validación: 100 pruebas, incluido el importe enviado a Wompi, conservación de 
 Impeccable: se conservó la identidad existente y el arte suministrado. El detector señaló 24 patrones existentes (fuente Helvetica elegida por el usuario, navegación, avisos y elementos fuera del alcance); no señaló el nuevo bloque del banner ni el desglose. No se cambió la marca por esas advertencias.
 
 Publicación comprobada en sharkpass.co: precios finales 59.500 y 95.081 COP, 100 sillas visibles, 30 bloqueadas, 20 Preferencial y 50 General disponibles al momento de la revisión. Salud del servidor: pagos prod y correo configurado. Se revisó el carrito público en móvil sin preparar pagos ni crear compras y se retiró la selección de prueba.
+
+Ajuste posterior solicitado por el propietario: se retiró del inicio el bloque adicional bajo el banner (título visible, fecha, precios, botón y nota). Se conserva el arte completo y un encabezado accesible oculto visualmente. El desglose sigue en el catálogo, la selección de entradas, carrito, checkout, confirmación y correos. Revisión en escritorio y móvil de 390 px, 100 pruebas y exportación/arranque de contenedor aprobados.

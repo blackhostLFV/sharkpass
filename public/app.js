@@ -337,8 +337,6 @@ async function events() {
     );
     publishedPanel.id="sharkcaribe-info";
     panel.replaceWith(publishedPanel);
-    const launchCta=content.querySelector("#official-event-cta");
-    if(launchCta){launchCta.href=`/evento/${firstPublished.id}`;launchCta.textContent="Ver entradas ↗";content.querySelector("#official-sale-status").textContent="Selecciona tu ubicación y revisa la disponibilidad.";}
   }
   if (previewMode)
     content.querySelector("#catalog-mode").textContent =
