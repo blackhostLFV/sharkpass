@@ -9,12 +9,14 @@
     {
       "name": "General",
       "priceCop": 50000,
-      "capacity": 50
+      "capacity": 50,
+      "finalPriceCop": 59500
     },
     {
       "name": "Preferencial",
       "priceCop": 79900,
-      "capacity": 50
+      "capacity": 50,
+      "finalPriceCop": 95081
     }
   ],
   "status": "draft",
@@ -32,7 +34,7 @@
   "eventId": "f73a9bc4-337b-4d83-a067-6d8722c1a8c6",
   "supportEmail": "notificaciones@sharkpass.co",
   "includes": "Únicamente ingreso al evento. Sin consumos ni beneficios adicionales.",
-  "allChargesIncluded": true,
+  "allChargesIncluded": false,
   "courtesyCapacity": 50,
   "seating": {
     "rows": 10,
@@ -65,5 +67,7 @@
     "Presente documento de identidad al ingreso.",
     "Prohibido el ingreso de alimentos y bebidas.",
     "Prohibido el ingreso de menores de 8 años."
-  ]
+  ],
+  "vatRate": 19,
+  "pricingNote": "priceCop es el valor base; IVA 19% adicional, redondeado por entrada. General total 59500 COP; Preferencial total 95081 COP."
 }

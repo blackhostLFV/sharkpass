@@ -1,5 +1,6 @@
+import {summarizePricing} from "/pricing.js?v=20261108-iva19";
 import {mountOrganizerLanding} from "/organizers.js?v=20261107-organizers-v5";
-import {mountSeatPicker} from "/seating.js?v=20261107-vendida-v5";
+import {mountSeatPicker} from "/seating.js?v=20261108-iva19";
 import {mountAdminConsole} from "/admin-console.js?v=20261107-console";
 import {setupMobileNavigation} from "/navigation.js?v=20261107-mobile-nav";
 import { demoEvents } from "/demo-events.js";
@@ -245,7 +246,7 @@ function eventCard(event, compact = false) {
       previewMode
         ? event.price_cop === 0 ? "Entrada libre" : `Desde ${price(event.price_cop)}`
         : event.has_available_tickets === false ? "Sin disponibilidad"
-          : Number.isInteger(event.min_price_cop) ? event.min_price_cop===0 ? "Desde Gratis" : `Desde ${money(event.min_price_cop)}` : "Consulta las entradas",
+          : Number.isInteger(event.min_price_cop) ? event.min_price_cop===0 ? "Desde Gratis" : `Desde · ${pricingText(event.min_pricing,1,event.min_price_cop)}` : "Consulta las entradas",
       { class: "price" },
     ),
     button("Ver evento", () => eventDetail(event.id)),
@@ -632,21 +633,32 @@ function checkoutSteps(current){
 function sandboxNotice(event){
   return event.is_demo?el("p","EVENTO DEMO · Solo para probar el sistema. No es una actividad real.",{class:"checkout-callout"}):null;
 }
+function pricingText(pricing,quantity=1,total=pricing?.totalCop*quantity){
+ const amounts=summarizePricing(pricing,quantity,total);
+ return amounts?`Base ${money(amounts.baseCop)} + IVA (${amounts.vatRate}%) ${money(amounts.vatCop)} = Total ${money(amounts.totalCop)}`:`Total ${money(total)} · Sin desglose de IVA registrado`;
+}
+function pricingLines(pricing,quantity,total){
+ const lines=el("dl",null,{class:"checkout-totals price-breakdown"}),amounts=summarizePricing(pricing,quantity,total);
+ if(amounts)lines.append(el("dt","Precio base"),el("dd",money(amounts.baseCop)),el("dt",`IVA (${amounts.vatRate}%)`),el("dd",money(amounts.vatCop)));
+ else lines.append(el("dt","Desglose de IVA"),el("dd","No registrado en esta compra original"));
+ lines.append(el("dt","Total · COP",{class:"checkout-total-label"}),el("dd",money(total),{class:"checkout-total"}));
+ return lines;
+}
 function checkoutSummary(event,type,quantity,total){
   const aside=el("aside",null,{class:"checkout-summary","aria-label":"Resumen de tu compra"});
   aside.append(el("h2","Resumen de compra"));
   const head=el("div",null,{class:"checkout-summary-event"});
   if(event.image)head.append(el("img",null,{src:event.image,alt:`Portada de ${event.title}`}));
   const info=el("div");info.append(el("h3",event.title),el("p",fmtDate(event.starts_at)),el("p",event.venue));head.append(info);aside.append(head);
-  const lines=el("dl",null,{class:"checkout-totals"});
-  lines.append(el("dt",`${quantity} × ${type.name}`),el("dd",money(total)),el("dt",total===0?"Total · Entrada gratuita":"Total a pagar · COP",{class:"checkout-total-label"}),el("dd",money(total),{class:"checkout-total"}));
+  const lines=pricingLines(type.pricing,quantity,total);
+  aside.append(el("p",`${quantity} × ${type.name}`));
   const seatNames=event.seats?.filter(seat=>basket?.seatIds?.includes(seat.id)).map(seat=>seat.row+seat.number)??[];
   if(seatNames.length)aside.append(el("p",`Sillas: ${seatNames.join(", ")}`,{class:"cart-seat-labels"}));
-  aside.append(lines,el("p","El total corresponde a las entradas seleccionadas. No se han añadido cargos adicionales.",{class:"checkout-fine-print"}));
+  aside.append(lines,el("p",type.pricing?"El total incluye el IVA desglosado arriba. Sin cargos de servicio adicionales.":"Esta compra conserva su importe original. No se ha añadido IVA retroactivamente.",{class:"checkout-fine-print"}));
   const note=sandboxNotice(event);if(note)aside.append(note);
   const breakdown=el("details",null,{class:"order-breakdown"});breakdown.open=!matchMedia("(max-width:780px)").matches;
-  const overview=el("summary");overview.append(el("span",event.title),el("strong",`${quantity} ${quantity===1?"entrada":"entradas"} · ${money(total)}`),el("small","Ver desglose del pedido"));
-  const detail=el("div");for(const child of [...aside.children].slice(1))detail.append(child);breakdown.append(overview,detail);aside.append(breakdown);
+  const overview=el("summary");overview.append(el("span",event.title),el("strong",`${quantity} ${quantity===1?"entrada":"entradas"} · ${money(total)}`),el("small","Ver datos del evento"));
+  const detail=el("div");detail.append(head);breakdown.append(overview,detail);aside.insertBefore(breakdown,lines);
   return aside;
 }
 async function cartPayment(){
@@ -693,7 +705,7 @@ async function cartContext(){
   if(!type){const error=new Error("La localidad seleccionada ya no está disponible. Elige tus entradas de nuevo.");error.status=404;throw error;}
   const payment=await cartPayment();
   const available=type.available+(payment?.state==="pending"?payment.quantity:0);
-  return {event,type,payment,available,total:payment?.state==="pending"?payment.totalCop:type.price_cop*basket.quantity};
+  return {event,type:payment?.state==="pending"?{...type,pricing:payment.pricing}:type,payment,available,total:payment?.state==="pending"?payment.totalCop:type.price_cop*basket.quantity};
 }
 function emptyCart(){
   heading("Tu carrito","Tu próximo gran plan empieza con una entrada.");
@@ -731,7 +743,7 @@ async function cartScreen(){
   const minus=button("−",()=>setQuantity(basket.quantity-1),"quantity-button");minus.setAttribute("aria-label","Disminuir cantidad");minus.disabled=basket.quantity<=1;
   const count=el("span",String(basket.quantity),{"aria-label":`${basket.quantity} ${basket.quantity===1?"entrada":"entradas"}`});
   const plus=button("+",()=>setQuantity(basket.quantity+1),"quantity-button");plus.setAttribute("aria-label","Aumentar cantidad");plus.disabled=basket.quantity>=Math.min(6,ctx.available);
-  quantity.append(minus,count,plus,el("span",`${money(ctx.type.price_cop)} por entrada`,{class:"quantity-price"}));
+  quantity.append(minus,count,plus,el("span",pricingText(ctx.type.pricing,1,ctx.payment?.state==="pending"?ctx.payment.totalCop/ctx.payment.quantity:ctx.type.price_cop),{class:"quantity-price"}));
   if(basket.seatIds){minus.disabled=true;plus.disabled=true;body.append(el("p",`Sillas: ${ctx.event.seats.filter(seat=>basket.seatIds.includes(seat.id)).map(seat=>seat.row+seat.number).join(", ")}`,{class:"cart-seat-labels"}),button("Cambiar sillas",async()=>{if(await changeBasket(null))await eventDetail(ctx.event.id);},"secondary"));}
   body.append(quantity,button("Eliminar del carrito",async()=>{if(await changeBasket(null))await show("cart");},"text-button cart-remove"));item.append(body);main.append(item);
   main.append(el("p","Puedes comprar hasta 6 entradas de una localidad por pedido.",{class:"checkout-fine-print"}));
@@ -823,7 +835,7 @@ async function eventDetail(id,adminPreview=false) {
   if(!event.types.length){purchase.append(el("p","Las entradas aún no están disponibles."));}
   else if(event.seats?.length){
     purchase.append(el("p","Escoge tus puestos en el mapa. Un QR por silla y un solo ingreso por entrada.",{class:"checkout-fine-print"}));
-    const availability=el("dl",null,{class:"seated-availability"});for(const type of event.types)availability.append(el("dt",type.name),el("dd",`${money(type.price_cop)} · ${type.available} disponibles`));purchase.append(availability,el("p","Todos los cargos incluidos. Únicamente ingreso al evento.",{class:"checkout-fine-print"}),button("Elegir mis sillas",()=>{const target=story.querySelector(".seat-picker");target.scrollIntoView({block:"start",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});target.querySelector(".seat-map-scroll").focus({preventScroll:true});},"checkout-primary"));
+    const availability=el("dl",null,{class:"seated-availability"});for(const type of event.types)availability.append(el("dt",type.name),el("dd",`${pricingText(type.pricing)} · ${type.available} disponibles`));purchase.append(availability,el("p","Precio base e IVA detallados por entrada. Sin cargos de servicio adicionales. Únicamente ingreso al evento.",{class:"checkout-fine-print"}),button("Elegir mis sillas",()=>{const target=story.querySelector(".seat-picker");target.scrollIntoView({block:"start",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});target.querySelector(".seat-map-scroll").focus({preventScroll:true});},"checkout-primary"));
     mountSeatPicker(story,event,{el,button,money,onChoose:async(type,seatIds)=>{if(adminPreview)throw new Error("Vista previa: la venta aún no está habilitada.");if(await changeBasket({eventId:event.id,typeId:type.id,quantity:seatIds.length,seatIds}))await show("cart");}});
   }
   else{
@@ -839,20 +851,20 @@ async function eventDetail(id,adminPreview=false) {
       const type=event.types.find(t=>t.id===f.elements.typeId.value);const max=Math.min(6,type?.available??0);quantities.replaceChildren();
       for(let q=1;q<=max;q++)quantities.append(el("option",`${q} ${q===1?"entrada":"entradas"}`,{value:String(q)}));
       f.querySelector("button[type=submit]").disabled=max===0;
-      total.textContent=max?money(type.price_cop*Number(quantities.value)):"Sin disponibilidad";
+      total.textContent=max?pricingText(type.pricing,Number(quantities.value),type.price_cop*Number(quantities.value)):"Sin disponibilidad";
     };
     for(const type of event.types){
       const label=el("label",null,{class:`ticket-option ${type.available===0?"sold-out":""}`});
       const radio=el("input",null,{type:"radio",name:"typeId",value:type.id,required:""});radio.checked=type.id===selected?.id;radio.disabled=type.available===0;
       const info=el("span",null,{class:"ticket-option-copy"});info.append(el("strong",type.name),el("small",type.available>0?`${type.available} disponibles`:"Agotado"));
-      label.append(radio,info,el("strong",price(type.price_cop),{class:"ticket-option-price"}));radio.addEventListener("change",updateQuantity);types.append(label);
+      label.append(radio,info,el("strong",pricingText(type.pricing),{class:"ticket-option-price"}));radio.addEventListener("change",updateQuantity);types.append(label);
     }
     const total=el("strong",null,{class:"picker-total"});quantityLabel.append(quantities);f.append(types,quantityLabel,el("p","Un evento y una localidad por compra. Hasta 6 entradas.",{class:"checkout-fine-print"}),total);f.appendSubmit();
-    quantities.addEventListener("change",()=>{const type=event.types.find(t=>t.id===f.elements.typeId.value);total.textContent=money(type.price_cop*Number(quantities.value));});
+    quantities.addEventListener("change",()=>{const type=event.types.find(t=>t.id===f.elements.typeId.value);total.textContent=pricingText(type.pricing,Number(quantities.value),type.price_cop*Number(quantities.value));});
     purchase.append(f,el("p","Podrás revisar tu carrito antes de iniciar sesión o pagar.",{class:"checkout-fine-print"}));updateQuantity();
     const section=el("section",null,{class:"locality-prices","aria-labelledby":"locality-prices-title"});section.append(el("p","ELIGE TU EXPERIENCIA",{class:"eyebrow"}),el("h2","Ubicación y precio",{id:"locality-prices-title"}),el("p","Compara las localidades antes de elegir. Valores por entrada en pesos colombianos.",{class:"locality-intro"}));
     const table=el("table"),caption=el("caption","Localidades y disponibilidad actual");table.append(caption);const head=el("thead"),tr=el("tr");for(const name of ["Localidad","Precio COP","Disponibles","Elegir"])tr.append(el("th",name,{scope:"col"}));head.append(tr);table.append(head);const tbody=el("tbody");
-    for(const type of event.types){const row=el("tr");row.append(el("th",type.name,{scope:"row"}),el("td",price(type.price_cop)),el("td",type.available>0?String(type.available):"Agotado"));const action=el("td");const choose=button("Elegir",()=>{for(const radio of types.querySelectorAll("input"))radio.checked=radio.value===type.id;updateQuantity();purchase.scrollIntoView({block:"start",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});quantities.focus({preventScroll:true});},"locality-choose");choose.setAttribute("aria-label",`Elegir ${type.name}`);choose.disabled=type.available===0;action.append(choose);row.append(action);tbody.append(row);}table.append(tbody);const scroll=el("div",null,{class:"locality-table-wrap"});scroll.append(table);section.append(scroll,el("p","El total actual corresponde a las entradas seleccionadas, sin cargos de servicio adicionales. La disponibilidad se vuelve a comprobar al preparar tu compra.",{class:"checkout-fine-print"}));
+    for(const type of event.types){const row=el("tr");row.append(el("th",type.name,{scope:"row"}),el("td",pricingText(type.pricing)),el("td",type.available>0?String(type.available):"Agotado"));const action=el("td");const choose=button("Elegir",()=>{for(const radio of types.querySelectorAll("input"))radio.checked=radio.value===type.id;updateQuantity();purchase.scrollIntoView({block:"start",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});quantities.focus({preventScroll:true});},"locality-choose");choose.setAttribute("aria-label",`Elegir ${type.name}`);choose.disabled=type.available===0;action.append(choose);row.append(action);tbody.append(row);}table.append(tbody);const scroll=el("div",null,{class:"locality-table-wrap"});scroll.append(table);section.append(scroll,el("p","El total actual corresponde a las entradas seleccionadas, sin cargos de servicio adicionales. La disponibilidad se vuelve a comprobar al preparar tu compra.",{class:"checkout-fine-print"}));
     if(event.is_demo)section.append(el("p","En esta prueba compras por localidad. El mapa de puestos es una demostración independiente y no asigna sillas a las boletas.",{class:"checkout-callout"}));story.append(section);
   }
   if(event.is_demo)purchase.append(el("a","Probar mapa de asientos →",{href:"/asientos-demo.html",class:"seat-demo-link"}),el("p","Demo visual independiente. No reserva puestos ni modifica esta compra.",{class:"checkout-fine-print"}));
@@ -1204,7 +1216,7 @@ async function orders() {
     card.append(date,info,button("Ver entradas",()=>orderDetail(order.id),"wallet-open"));list.append(card);
   }
   content.append(list);
-  if(paymentsConfigured){const attempts=(await request("payments")).filter(p=>p.state!=="confirmed");if(attempts.length){const pending=el("details",null,{class:"wallet-tools"});pending.append(el("summary",`Pagos por revisar (${attempts.length})`));for(const attempt of attempts){const row=el("div",null,{class:"wallet-payment"});row.append(el("span",`${price(attempt.totalCop)} · ${paymentLabels[attempt.state]??attempt.state}`),button("Consultar pago",()=>paymentDetail(attempt.id),"secondary"));pending.append(row);}content.append(pending);}}
+  if(paymentsConfigured){const attempts=(await request("payments")).filter(p=>p.state!=="confirmed");if(attempts.length){const pending=el("details",null,{class:"wallet-tools"});pending.append(el("summary",`Pagos por revisar (${attempts.length})`));for(const attempt of attempts){const row=el("div",null,{class:"wallet-payment"});row.append(el("span",`${pricingText(attempt.pricing,attempt.quantity,attempt.totalCop)} · ${paymentLabels[attempt.state]??attempt.state}`),button("Consultar pago",()=>paymentDetail(attempt.id),"secondary"));pending.append(row);}content.append(pending);}}
 }
 function openTicketViewer(order,index){
   const dialog=el("dialog",null,{class:"ticket-viewer","aria-labelledby":"ticket-viewer-title"});
@@ -1225,7 +1237,7 @@ async function orderDetail(id) {
   content.append(button("← Mis entradas",()=>show("orders"),"wallet-back"));
   const receipt=el("section",null,{class:"wallet-receipt"}),identity=el("div",null,{class:"wallet-receipt-info"});
   identity.append(el("span",order.state==="confirmed"?"Compra confirmada":"Compra anulada",{class:`wallet-status ${order.state!=="confirmed"?"inactive":""}`}),el("h2",order.title),el("p",fmtDate(order.starts_at)),el("p",order.venue));
-  const stats=el("div",null,{class:"wallet-receipt-stats"});stats.append(el("span",`${order.quantity} ${order.quantity===1?"entrada":"entradas"}`),el("strong",price(order.total_cop)),el("small",order.type_name));receipt.append(identity,stats);content.append(receipt);
+  const stats=el("div",null,{class:"wallet-receipt-stats"});stats.append(el("span",`${order.quantity} ${order.quantity===1?"entrada":"entradas"}`),el("strong",price(order.total_cop)),el("small",order.type_name));receipt.append(identity,stats);content.append(receipt,pricingLines(order.pricing,order.quantity,order.total_cop));
   if(order.is_demo)content.append(el("p","ENTRADAS DEMO · Sin validez comercial ni ingreso a un evento real.",{class:"wallet-demo"}));
   const tools=el("details",null,{class:"wallet-tools"});tools.append(el("summary","Correo y comprobante"),el("p",`Referencia: ${order.id}`,{class:"checkout-reference"}));
   let delivery;try{delivery=await request(`orders/${id}/email`);}catch{tools.append(el("p","No pudimos consultar el correo. Tus entradas siguen disponibles aquí."));}

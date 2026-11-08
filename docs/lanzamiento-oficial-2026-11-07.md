@@ -35,3 +35,5 @@ Banner conceptual panorámico y tarjeta de tiburón separada del afiche oficial.
 ## Ajustes de disponibilidad y navegación
 
 A petición del propietario, las sillas asignadas muestran una banda visual «Vendida» y mantienen el número legible encima. Las reservas temporales indican «Reservada». La etiqueta visual no crea pagos, ingresos ni tickets; el bloqueo del servidor permanece vigente. Se conserva un único acceso «Ingresar» junto al buscador. El footer agrupa sus enlaces en la franja inferior, con disposición adaptable. Revisión local de estados ocupados, vendidos y reservados con datos DEMO, separación geométrica entre número y banda en 390 px y ausencia de desbordamiento global.
+
+Actualización del 8 de noviembre: el propietario indicó añadir IVA del 19% a las bases indicadas arriba. Véase [banner y desglose actualizado](banner-e-iva-2026-11-08.md). Los importes anteriores de este informe son el estado previo a esa instrucción.

@@ -1,3 +1,4 @@
+import {paymentPricing,orderPricing} from "./pricing.mjs";
 import {seatLabel} from "./seating.mjs";
 import { AppError } from "./store.mjs";
 import {randomUUID} from "node:crypto";
@@ -141,6 +142,7 @@ export class Mailer {
         );
         continue;
       }
+      order.pricing=row.payment_id?paymentPricing(this.store,row.payment_id):orderPricing(this.store,row.order_id);
       const seatedOrderId=order.order_id;
       if(seatedOrderId){const labels=this.store.all("SELECT t.id FROM tickets t WHERE t.order_id=?",seatedOrderId).map(ticket=>seatLabel(this.store,ticket.id)).filter(Boolean);if(labels.length)order.type_name+=` · Sillas ${labels.join(", ")}`;}
       try {

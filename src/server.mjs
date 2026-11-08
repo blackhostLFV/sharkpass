@@ -356,6 +356,8 @@ export function createApp({
         res.writeHead(200,{...headers,'Content-Type':url.pathname==='/robots.txt'?'text/plain; charset=utf-8':'application/xml; charset=utf-8'});return res.end(method==='HEAD'?undefined:body);
       }
       const assets = {
+        "/pricing.js": ["pricing.js", "text/javascript; charset=utf-8"],
+        "/media/sharkcaribe-banner-2026.webp": ["media/sharkcaribe-banner-2026.webp", "image/webp"],
         "/organizers.js": ["organizers.js", "text/javascript; charset=utf-8"],
         "/organizers.css": ["organizers.css", "text/css; charset=utf-8"],
         "/seating.js": ["seating.js", "text/javascript; charset=utf-8"],

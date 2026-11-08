@@ -16,7 +16,7 @@ SharkPass facilita descubrir y comprar entradas para eventos que pueden motivar 
 
 ## Estado al 8 de noviembre de 2026
 
-La web está desplegada en Hostinger. Wompi está configurado en producción y el transporte SMTP está configurado. El evento oficial Shark Caribe está publicado con selección de silla: 50 puestos Preferencial y 50 General; los primeros 30 Preferencial están bloqueados por asignación del organizador. Las 50 cortesías están separadas del catálogo público.
+La web está desplegada en Hostinger. Wompi está configurado en producción y el transporte SMTP está configurado. El evento oficial Shark Caribe está publicado con selección de silla: 50 puestos Preferencial y 50 General; los primeros 30 Preferencial están bloqueados por asignación del organizador. Las 50 cortesías están separadas del catálogo público. Los precios nuevos se desglosan con IVA del 19%: General $50.000 + $9.500 = $59.500 COP; Preferencial $79.900 + $15.181 = $95.081 COP. Las reservas y compras anteriores conservan sus importes originales.
 
 **Pendiente operativo:** una compra real completa para comprobar la notificación de Wompi, entrega del correo y emisión del QR en producción; prueba física con tablets, prueba de carga y restauración desde un respaldo externo. La configuración activa de un servicio no equivale a certificar su operación completa.
 

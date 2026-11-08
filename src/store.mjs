@@ -1,3 +1,4 @@
+import {typePricing,orderPricing} from "./pricing.mjs";
 import {saleRules,checkoutRegistration,attendeeName} from "./registration.mjs";
 import {publicSeatMap,selectedSeats,assignSeat,normalizeSeatIds} from "./seating.mjs";
 import { DatabaseSync } from "node:sqlite";
@@ -409,7 +410,7 @@ export class Store {
     };
   }
   eventTypes(id,includeInternal=false) {
-    return this.all("SELECT t.*,MAX(0,t.capacity-(SELECT COUNT(*) FROM seat_blocks b JOIN event_seats s ON s.id=b.seat_id WHERE s.type_id=t.id)-COALESCE((SELECT SUM(quantity) FROM orders WHERE type_id=t.id AND state='confirmed'),0)-COALESCE((SELECT SUM(quantity) FROM payment_attempts WHERE type_id=t.id AND state='pending' AND expires_at>?),0)) AS available FROM ticket_types t LEFT JOIN ticket_type_visibility v ON v.type_id=t.id WHERE t.event_id=? AND (? OR COALESCE(v.visibility,'public')='public')",Date.now(),id,includeInternal?1:0);
+    return this.all("SELECT t.*,MAX(0,t.capacity-(SELECT COUNT(*) FROM seat_blocks b JOIN event_seats s ON s.id=b.seat_id WHERE s.type_id=t.id)-COALESCE((SELECT SUM(quantity) FROM orders WHERE type_id=t.id AND state='confirmed'),0)-COALESCE((SELECT SUM(quantity) FROM payment_attempts WHERE type_id=t.id AND state='pending' AND expires_at>?),0)) AS available FROM ticket_types t LEFT JOIN ticket_type_visibility v ON v.type_id=t.id WHERE t.event_id=? AND (? OR COALESCE(v.visibility,'public')='public')",Date.now(),id,includeInternal?1:0).map(type=>({...type,pricing:typePricing(this,type)}));
   }
   events() {
     return this.all(
@@ -417,7 +418,7 @@ export class Store {
       now(),
     ).map(event=>{
       const available=this.eventTypes(event.id).filter(type=>type.available>0);
-      return {...event,min_price_cop:available.length?Math.min(...available.map(type=>type.price_cop)):null,has_available_tickets:available.length>0};
+      return {...event,min_pricing:available.length?available.reduce((a,b)=>a.price_cop<=b.price_cop?a:b).pricing:null,min_price_cop:available.length?Math.min(...available.map(type=>type.price_cop)):null,has_available_tickets:available.length>0};
     });
   }
   managedEvents(user) {
@@ -585,6 +586,7 @@ export class Store {
     if (!order) fail(404, "Compra no disponible.");
     return {
       ...order,
+      pricing:orderPricing(this,id),
       tickets: this.all(
         "SELECT t.id,t.token,t.status,t.used_at,a.full_name AS attendeeName,CASE WHEN s.id IS NOT NULL THEN s.row_label||s.seat_number END AS seatLabel FROM tickets t LEFT JOIN ticket_attendees a ON a.ticket_id=t.id LEFT JOIN ticket_seats x ON x.ticket_id=t.id LEFT JOIN event_seats s ON s.id=x.seat_id WHERE t.order_id=?",
         id,

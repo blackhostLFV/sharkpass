@@ -1,3 +1,4 @@
+import {paymentPricing} from "./pricing.mjs";
 import {checkoutRegistration} from "./registration.mjs";
 import {normalizeSeatIds,selectedSeats,holdSeats,paymentSeats,heldSeatsMatch,assignSeat} from "./seating.mjs";
 import {
@@ -192,6 +193,8 @@ export class Payments {
         expires,
         at,
       );
+      const pricing=type.pricing;
+      this.store.run("INSERT INTO payment_pricing VALUES(?,?,?,?,?)",id,pricing.baseCop,pricing.vatRate,pricing.vatCop,pricing.totalCop);
       holdSeats(this.store,seats,id,expires);
       if(registration)this.store.run("INSERT INTO payment_registrations VALUES(?,?,?,?)",id,JSON.stringify(registration.attendees),registration.termsVersion,at);
       row = this.store.get("SELECT * FROM payment_attempts WHERE id=?", id);
@@ -234,12 +237,13 @@ export class Payments {
       state,
       environment: row.environment,
       totalCop: row.amount_cents / 100,
+      pricing: paymentPricing(this.store,row.id),
       quantity: row.quantity,
       expiresAt: new Date(row.expires_at).toISOString(),
       orderId: row.order_id,
       email: row.email,
       event,
-      type: {...type,name:type.name+(seats.length?` · Sillas ${seats.map(seat=>seat.row+seat.number).join(", ")}`:""),unitPriceCop:row.amount_cents / 100 / row.quantity},
+      type: {...type,pricing:paymentPricing(this.store,row.id),name:type.name+(seats.length?` · Sillas ${seats.map(seat=>seat.row+seat.number).join(", ")}`:""),unitPriceCop:row.amount_cents / 100 / row.quantity},
       seats,
       seatIds:seats.map(seat=>seat.id).sort(),
       serverNow: new Date(this.clock()).toISOString(),

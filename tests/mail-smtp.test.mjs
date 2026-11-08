@@ -5,7 +5,7 @@ const env = { MAIL_PROVIDER:'smtp', SMTP_HOST:'smtp.example.invalid', SMTP_PORT:
 const publicUrl='https://example.invalid';
 function queuedStore(state='queued') {
  const row={id:'receipt-test',payment_id:'payment-test',state,next_at:0,attempts:0,first_attempt_at:null};
- return {row,all:()=>[],transaction:fn=>fn(),get(sql){if(sql.includes('mail_outbox'))return ['queued','sending'].includes(row.state)&&row.next_at<=1000?{...row}:null;return {state:'confirmed',email:'buyer@example.invalid',order_id:'order-test',environment:'test',title:'DEMO <event>',quantity:1};},run(sql,...args){if(sql.includes("state='sending'")){row.state='sending';row.next_at=args[0];}else if(sql.includes("state='sent'"))row.state='sent';else if(sql.includes("state='attention'"))row.state='attention';else {row.state='queued';row.next_at=args[0];}}};
+ return {row,all:()=>[],transaction:fn=>fn(),get(sql){if(sql.includes('payment_pricing'))return null;if(sql.includes('mail_outbox'))return ['queued','sending'].includes(row.state)&&row.next_at<=1000?{...row}:null;return {state:'confirmed',email:'buyer@example.invalid',order_id:'order-test',environment:'test',title:'DEMO <event>',quantity:1};},run(sql,...args){if(sql.includes("state='sending'")){row.state='sending';row.next_at=args[0];}else if(sql.includes("state='sent'"))row.state='sent';else if(sql.includes("state='attention'"))row.state='attention';else {row.state='queued';row.next_at=args[0];}}};
 }
 test('SMTP requires complete private config, HTTPS and TLS ports; no fallback',async()=>{
  for(const partial of [{SMTP_PASSWORD:''},{SMTP_USER:''},{SMTP_HOST:''},{SMTP_PORT:'25'},{MAIL_FROM:''},{MAIL_PROVIDER:'unknown'}]){
