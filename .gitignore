@@ -1,0 +1,27 @@
+node_modules/
+data/
+.env*
+!.env.example
+*.dump
+*.sqlite*
+
+# Expo build output
+.expo/
+apps/mobile/dist/
+apps/mobile/expo-env.d.ts
+
+# Private one-use operations (never commit)
+ops/
+
+# Hosting account metadata and local artifacts
+.hostinger/
+.DS_Store
+*.log
+*.zip
+*.tgz
+coverage/
+output/
+tmp/
+
+__pycache__/
+*.pyc

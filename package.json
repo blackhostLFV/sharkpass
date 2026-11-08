@@ -1,0 +1,28 @@
+{
+  "name": "sharkpass",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.17.1 <23"
+  },
+  "scripts": {
+    "start": "node --experimental-sqlite src/hostinger.mjs",
+    "check": "node scripts/check-syntax.mjs && npm run typecheck:mobile && node --experimental-sqlite --test tests/*.test.mjs",
+    "build": "node scripts/check-syntax.mjs && npm run build:mobile",
+    "build:server": "node scripts/check-syntax.mjs",
+    "launch:status": "node scripts/launch-status.mjs",
+    "dev": "node --experimental-sqlite scripts/dev.mjs",
+    "dev:mobile": "npm run start --workspace=@sharkpass/mobile",
+    "build:mobile": "npm run export --workspace=@sharkpass/mobile",
+    "typecheck:mobile": "npm run typecheck --workspace=@sharkpass/mobile"
+  },
+  "dependencies": {
+    "qrcode": "1.5.4",
+    "nodemailer": "10.3.1"
+  },
+  "workspaces": [
+    "apps/*"
+  ],
+  "main": "src/hostinger.mjs"
+}

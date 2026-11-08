@@ -1,0 +1,13 @@
+# Recorrido de compra y prueba de asientos
+
+Se revisaron catálogo, ficha, carrito, acceso, datos, preparación de pago y confirmación/entradas. Referencia de UX: https://baymard.com/blog/payment-ux (total y resumen accesibles durante el pago), https://www.eventbrite.com/help/en-us/articles/333111/www.eventbrite.com/ (recorrido de compra).
+
+Cambios: cabecera concentrada en la compra, títulos directos y tipografía regular, superficies sin sombras/degradados, carrito compacto, resumen plegable antes del formulario en móvil, errores de servidor junto al envío del formulario y acceso directo a boletas después de confirmar. Las opciones de copia adicional de correo quedan plegadas. Se corrigieron enlaces de cuenta relativos que podían conservar la ruta del evento.
+
+Prueba local con datos sintéticos: catálogo → evento gratuito → dos entradas → carrito → acceso por correo sin perder selección → confirmación de correo → emisión de dos QR y carrito vacío. Ruta de pago: selección → datos → reserva pendiente con vencimiento → enlace Wompi preparado. No se envió esa transacción al proveedor; no se hizo un cobro ni se usó un medio de pago real. La recepción SMTP se había verificado en la entrega anterior; no se duplicaron envíos en esta revisión.
+
+Mapa independiente en `/asientos-demo.html`: escenario SVG, 8 filas y 12 puestos por fila, dos zonas/precios ilustrativos, ocupación sintética, selección y eliminación, total, límite de seis y revisión. Ocupados deshabilitados, controles con nombres accesibles, navegación por teclado y plano desplazable dentro de su contenedor móvil. Se comprobó selección de seis por 480.000, bloqueo del séptimo y combinación de dos zonas por 130.000 COP, limpiar y revisar. No llama a APIs ni almacena selección; no modifica el carrito, reserva ni vende asientos. Para venderlos falta inventario individual y reserva transaccional de puestos, además de enlazar pago y boleta al puesto. Se enlaza únicamente desde eventos DEMO y la página tiene noindex.
+
+Validación: `npm run check` (69 pruebas: permisos, cupos, idempotencia y escaneo), `npm run build` (iOS/Android/web), imagen Docker y health, assets del mapa con HTTP 200. Se usó la copia limpia de release con el mismo lockfile porque el ejecutable tsc de node_modules en el repositorio original estaba dañado. Se revisó móvil a 390 px sin desbordamiento de página, resumen antes de los datos y desplazamiento interno del mapa; revisión visual de escritorio. No se ha certificado Outlook físico ni realizado una nueva transacción Wompi completa con tarjeta.
+
+Publicado y comprobado: build `01a1b798-3016-719e-a77e-5e1036b26749`. Checkout nuevo visible y mapa público con selección A1/A2 por 160.000 COP ficticios.

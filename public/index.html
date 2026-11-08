@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="es-CO">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="theme-color" content="#2970ff" />
+    <meta
+      name="description"
+      content="SharkPass, la ticketera independiente. Descubre eventos y gestiona tus entradas."
+    />
+    <title>SharkPass · Entra a vivirlo</title>
+    <link rel="icon" href="/brand/sharkpass-official.png" type="image/png" />
+    <link rel="stylesheet" href="/style.css?v=20261107-sharkcaribe-card-v3" />
+    <link rel="stylesheet" href="/app-shell.css?v=20261107-sharkcaribe-card-v3" />
+    <script src="/app.js?v=20261107-sharkcaribe-card-v3" type="module"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#content">Saltar al contenido</a>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="SharkPass, inicio"
+        ><img
+          src="/brand/sharkpass-logo-light.svg?v=20261107-vector"
+          alt="SharkPass"
+          width="100"
+          height="85"
+      /></a>
+      <button type="button" id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="site-navigation" aria-label="Abrir menú"><span aria-hidden="true">☰</span><span>Menú</span></button>
+      <nav id="site-navigation" class="main-nav" aria-label="Navegación principal">
+        <button type="button" data-view="events">Explorar eventos</button>
+        <button type="button" data-view="organizer">Para organizadores</button>
+        <button type="button" data-view="orders">Mis entradas</button>
+        <button type="button" data-view="favorites">Favoritos</button>
+        <button type="button" data-view="account">Iniciar sesión</button>
+        <button type="button" id="platform-admin-link" data-view="admin" hidden>Administración</button>
+      </nav>
+      <button type="button" id="cart-access" data-view="cart" class="cart-access"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.5 12h11l2-8H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg><span class="cart-label">Carrito</span><span id="cart-count">0</span></button>
+      <button type="button" data-view="organizer" class="organizer-access">
+        Crear evento
+      </button>
+      <a href="/?view=account" class="header-guest">Ingresar</a><div class="header-session" hidden><span class="header-session-avatar" aria-hidden="true"></span><div class="header-session-copy"><span class="header-session-label"></span><span class="header-session-status">Sesión iniciada</span></div><a href="/?view=account" class="header-session-link" aria-label="Abrir Mi cuenta">Mi cuenta <span aria-hidden="true">›</span></a></div>
+      <form id="header-search" class="header-search" role="search" aria-label="Buscar eventos en SharkPass">
+        <label class="header-query"><span class="sr-only">Buscar por artista, evento o lugar</span><input name="query" type="search" placeholder="Buscar por artista, evento…" aria-label="Buscar por artista, evento o lugar" maxlength="150" autocomplete="off"></label>
+        <button id="search-filter-toggle" type="button" class="header-filter-toggle" aria-label="Mostrar filtros de búsqueda" aria-expanded="false" aria-controls="header-filters"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 6h10m4 0h4M3 12h4m4 0h10M3 18h12m4 0h2"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg></button>
+        <button type="submit" class="header-search-submit" aria-label="Buscar eventos"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="7.2"/><path d="m16 16 5 5"/></svg></button>
+        <div id="header-filters" class="header-filters" hidden><label>Categoría<select name="category" aria-label="Filtrar eventos por categoría"><option value="">Todas las experiencias</option></select></label><p>Busca por nombre, artista, lugar u organizador. Elige una categoría y pulsa la lupa.</p></div>
+      </form>
+    </header>
+    <div id="pilot-notice" class="pilot-notice">
+      <span class="status-dot" aria-hidden="true"></span
+      ><span
+        >Vista previa pública · Ventas de entradas aún no habilitadas.</span
+      ><a href="/?demo=1">Ver demo visual</a>
+    </div>
+    <main>
+      <div id="message" role="status" aria-live="polite"></div>
+      <div id="content"></div>
+    </main>
+    <footer class="brand-footer"><div class="footer-identity"><a href="/" class="footer-brand" aria-label="SharkPass, inicio"><img src="/brand/sharkpass-official.png" width="116" height="98" alt="SharkPass" loading="lazy" /></a><p>Tu entrada a vivirlo.<br>Descubre. Conecta. Disfruta.</p></div><div><a href="/#que-es">Qué es SharkPass</a><a href="/?view=events">Explorar eventos</a><a href="/?view=orders">Mis entradas</a><a href="/?view=organizer">Organizadores</a></div><p>© 2026 SharkPass · Tu entrada a vivirlo.</p></footer>
+    <nav class="mobile-nav" aria-label="Navegación móvil">
+      <button type="button" data-view="events">
+        <img
+          src="/design/eventora/054e4.svg"
+          width="24"
+          height="24"
+          alt=""
+        />Inicio
+      </button>
+      <button type="button" data-view="orders">
+        <img
+          src="/design/eventora/fd06a.svg"
+          width="18.165"
+          height="19.91"
+          alt=""
+        />Mis entradas
+      </button>
+      <button type="button" data-view="favorites">
+        <img
+          src="/design/eventora/ad15b.svg"
+          width="24"
+          height="24"
+          alt=""
+        />Favoritos
+      </button>
+      <button type="button" data-view="account">
+        <img
+          src="/design/eventora/49f8c.svg"
+          width="24"
+          height="24"
+          alt=""
+        />Perfil
+      </button>
+    </nav>
+    <template id="home-template">
+      <section class="official-launch official-launch-cinematic" aria-labelledby="hero-title">
+        <div class="official-launch-copy">
+          <p class="official-kicker">EMPRENDIMIENTO · INNOVACIÓN · CARIBE</p>
+          <h1 id="hero-title">4.ª Pitch Competition<br><span>Shark Caribe</span></h1>
+          <p class="official-intro">Las ideas del Caribe, en un mismo escenario. Acompaña la gran final de emprendimiento e innovación.</p>
+          <dl class="official-event-facts"><div><dt>Cuándo</dt><dd>Miércoles 25 de noviembre de 2026<br>4:00 p. m. – 9:30 p. m.</dd></div><div><dt>Dónde</dt><dd>Hotel Dann Carlton · Barranquilla<br>Salón Los Laureles · Piso 12</dd></div></dl>
+          <div class="official-price-strip"><span>General <strong>$50.000</strong></span><span>Preferencial <strong>$79.900</strong></span></div>
+          <p class="official-price-note">Valores en COP. Todos los cargos incluidos. Las entradas incluyen únicamente el ingreso al evento.</p>
+          <a id="official-event-cta" class="official-event-cta" href="#sharkcaribe-info">Información del evento <span aria-hidden="true">↗</span></a>
+          <p id="official-sale-status" class="official-sale-status">Estamos preparando la apertura de ventas.</p>
+        </div>
+        <figure class="official-launch-art"><img src="/media/sharkcaribe-pitch-hero-2026.webp" alt="Escena conceptual de emprendimiento: una presentación ante el público, con iluminación azul y violeta inspirada en Shark Caribe." width="2103" height="748" fetchpriority="high" decoding="async"><figcaption>Imagen conceptual</figcaption></figure><div class="official-date-mark" aria-hidden="true"><span>25</span><span>NOV / 2026</span><small>BARRANQUILLA</small></div>
+      </section>
+      <div class="discovery-intro"><h2>¿Qué quieres vivir?</h2><p>Encuentra eventos, elige tu plan y lleva tu entrada contigo.</p></div>
+      <form id="event-search" class="search-bar" role="search">
+        <label class="search-query"
+          ><span class="sr-only">Buscar eventos</span>
+          <img
+            src="/design/eventora/afe74.svg"
+            width="16.8869"
+            height="17.2683"
+            alt="" />
+          <input
+            name="query"
+            type="search"
+            placeholder="Busca un evento, artista o lugar"
+            aria-label="Buscar eventos"
+        /></label>
+        <label
+          ><span class="sr-only">Categoría</span
+          ><select name="category" aria-label="Categoría de eventos">
+            <option value="">Todas las experiencias</option>
+          </select></label
+        >
+        <button type="submit">Buscar</button>
+      </form>
+      <div class="discovery-columns">
+        <section
+          id="catalog"
+          class="catalog-section"
+          aria-labelledby="catalog-title"
+        >
+          <div class="section-heading">
+            <h2 id="catalog-title">Eventos destacados</h2>
+            <span id="catalog-mode" class="mode-label">Eventos publicados</span>
+          </div>
+          <div
+            id="category-tabs"
+            class="category-tabs"
+            role="group"
+            aria-label="Filtrar por categoría"
+          ></div>
+          <p id="result-count" class="muted" aria-live="polite"></p>
+          <div id="event-list" class="grid event-grid"></div>
+        </section>
+        <section class="upcoming-section" aria-labelledby="upcoming-title">
+          <div class="section-heading">
+            <h2 id="upcoming-title">Próximos eventos</h2>
+          </div>
+          <div id="upcoming-list" class="upcoming-list"></div>
+          <details class="first-event" id="sharkcaribe-info">
+            <summary>
+              Pitch Competition by Shark Caribe
+              <span>25 NOV · En preparación</span>
+            </summary>
+            <p>Hotel Dann Carlton Barranquilla · Salón Los Laureles.</p>
+            <p>
+              25 de noviembre · 4:00 p. m.–9:30 p. m. Salón Los Laureles, piso 12. General: $50.000; Preferencial: $79.900. Todos los cargos incluidos; únicamente ingreso al evento. 50 puestos por localidad. Venta aún no habilitada.
+            </p>
+          </details>
+        </section>
+      </div>
+      <section id="que-es" class="brand-story"><div><p class="eyebrow">MUCHO MÁS QUE UNA ENTRADA</p><h2>Somos SharkPass.<br><em>Nos mueve lo que vives.</em></h2></div><div><p>Una ticketera independiente que conecta personas con eventos. Un lugar para descubrir experiencias, gestionar tus entradas y acompañar a quienes crean momentos memorables.</p><p>Del primer clic al ingreso: el evento es el protagonista. SharkPass es tu entrada.</p></div></section>
+      <section id="como-funciona" class="how-section"><p class="eyebrow">DE LA ORILLA AL EVENTO</p><h2>Así entras a vivirlo.</h2><div class="how-grid"><article><span>01 / EXPLORA</span><h3>Encuentra tu ola</h3><p>Busca un evento y revisa su fecha, lugar y entradas disponibles.</p></article><article><span>02 / ELIGE</span><h3>Hazlo tu próximo plan</h3><p>Selecciona tu entrada y revisa el total antes de confirmar.</p></article><article><span>03 / DISFRUTA</span><h3>Tu entrada, contigo</h3><p>Cuando se confirme tu pedido, consulta tu entrada QR en Mis entradas y preséntala al ingresar.</p></article></div></section>
+      <section class="organizer-wave"><div><p class="eyebrow">PARA LOS QUE CREAN GRANDES MOMENTOS</p><h2>Tú creas el momento.<br><em>Nosotros los tickets.</em></h2><p>Prepara tu evento, administra los cupos y organiza el ingreso de tu equipo desde SharkPass.</p><a class="hero-primary" href="/?view=organizer">Organiza con SharkPass</a></div></section>
+    </template>
+  </body>
+</html>

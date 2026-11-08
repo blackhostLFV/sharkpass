@@ -1,0 +1,69 @@
+{
+  "title": "Pitch Competition by Shark Caribe",
+  "organizer": "Shark Caribe",
+  "date": "2026-11-25",
+  "time": "16:00",
+  "venue": "Hotel Dann Carlton Barranquilla · Salón Los Laureles · Piso 12",
+  "description": "Asiste y apoya a los participantes de la Gran Final de Pitch Competition by Shark Caribe. Un encuentro de emprendimiento e innovación en Barranquilla.",
+  "ticketTypes": [
+    {
+      "name": "General",
+      "priceCop": 50000,
+      "capacity": 50
+    },
+    {
+      "name": "Preferencial",
+      "priceCop": 79900,
+      "capacity": 50
+    }
+  ],
+  "status": "draft",
+  "missing": [
+    "Credenciales y prueba real de Wompi producción",
+    "Prueba física de lectura y respaldo externo con restauración"
+  ],
+  "endTime": "21:30",
+  "address": "Calle 98 No. 52B-10, Riomar · Barranquilla",
+  "source": "https://www.sharkcaribe.co/",
+  "verifiedAt": "2026-11-07",
+  "image": "/media/sharkcaribe-pitch-oficial-2026.webp",
+  "imageSource": "Arte oficial suministrado por el propietario el 7 de noviembre de 2026",
+  "category": "Emprendimiento e innovación",
+  "eventId": "f73a9bc4-337b-4d83-a067-6d8722c1a8c6",
+  "supportEmail": "notificaciones@sharkpass.co",
+  "includes": "Únicamente ingreso al evento. Sin consumos ni beneficios adicionales.",
+  "allChargesIncluded": true,
+  "courtesyCapacity": 50,
+  "seating": {
+    "rows": 10,
+    "seatsPerRow": 10,
+    "preferentialRows": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "generalRows": [
+      "F",
+      "G",
+      "H",
+      "I",
+      "J"
+    ],
+    "courtesyArea": "Área aparte, sin silla asignada en el mapa público.",
+    "occupiedPreferentialRows": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "termsVersion": "sharkcaribe-20261107-v1",
+  "terms": [
+    "Acomodación en la silla numerada seleccionada y confirmada en la compra.",
+    "Diligencie un registro por asistente; es obligatorio para ingresar al recinto.",
+    "Presente documento de identidad al ingreso.",
+    "Prohibido el ingreso de alimentos y bebidas.",
+    "Prohibido el ingreso de menores de 8 años."
+  ]
+}

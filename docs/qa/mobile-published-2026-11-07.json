@@ -1,0 +1,19 @@
+{
+  "dates": [
+    {
+      "fitsHeight": true,
+      "fitsWidth": true,
+      "text": "18 de noviembre de 2026 a las 6:00 p. m.",
+      "visible": true
+    },
+    {
+      "fitsHeight": true,
+      "fitsWidth": true,
+      "text": "19 de noviembre de 2026 a las 6:00 p. m.",
+      "visible": true
+    }
+  ],
+  "menuVisible": true,
+  "overflow": false,
+  "width": 390
+}

@@ -1,0 +1,26 @@
+# Historias de usuario — lanzamiento SharkPass
+
+5 de noviembre de 2026. Estados: I = implementada; V = verificación pendiente; B = bloqueada por configuración/dato externo. Una historia I no se considera aceptada para producción sin evidencia de sus criterios. Registro es una funcionalidad existente.
+
+| ID | Historia y prioridad | Criterios de aceptación verificables | Estado inicial |
+|---|---|---|---|
+| HU-01 | Como comprador quiero registrarme e iniciar sesión (P0) | Nombre/teléfono/usuario/contraseña válidos crean una cuenta; usuario duplicado y datos inválidos se rechazan; contraseña no se almacena en claro; login incorrecto no abre sesión; logout revoca acceso | I/V navegador |
+| HU-02 | Como comprador quiero recuperar mi acceso (P0) | Correo de recuperación verificado; enlace llega al buzón, vence en 15min y sirve una vez; restablecer revoca sesiones; token falso/vencido se rechaza sin exponer cuentas | I/B correo |
+| HU-03 | Como visitante quiero encontrar el evento correcto (P0) | Catálogo muestra solo publicados; búsqueda abre el ID seleccionado; fechas/lugar/precios corresponden a datos reales; borradores no son públicos | I/V contenido |
+| HU-04 | Como organizador quiero preparar el evento (P0) | Tres pasos conservan valores al retroceder; obligatorios se validan; Enter no salta revisión; confirmar crea un único borrador; fecha Bogotá correcta; otro organizador no edita | I/V asistente |
+| HU-05 | Como organizador quiero configurar entradas y publicar (P0) | Tipo/precio/cupo válidos; no publicar sin datos requeridos; cupo no se reduce por debajo de emitidos/reservas; comprador no puede publicar; usar fuente oficial del evento | I/V |
+| HU-06 | Como comprador quiero seleccionar cantidad y precio final (P0) | Cantidad válida y disponible; servidor calcula importe COP; alteración de precio o cantidad rechazada; mostrar total antes de pagar; agotado no admite venta | I/V Wompi |
+| HU-07 | Como comprador quiero pagar con Wompi (P0) | Aprobado genera pedido; rechazado/pendiente no emiten entradas; firma/ambiente/importe/referencia se verifican; credenciales privadas nunca llegan al cliente; retorno no autoriza por sí solo | I/B credenciales y HTTPS |
+| HU-08 | Como organizador quiero impedir sobreventa y cobros/emisión duplicados (P0) | Dos compras del último cupo no lo obtienen ambas; doble clic y webhook repetido no duplican entradas; reserva vencida libera cupo; pago tardío pasa a revisión sin sobreventa | I/V proveedor y carga |
+| HU-09 | Como comprador quiero un identificador individual (P0) | Compra N genera N ID y N QR distintos, impredecibles; cada QR corresponde a una entrada/pedido/evento; no incluye datos personales legibles; otro usuario no puede descargarlo | I/V escaneo real |
+| HU-10 | Como comprador quiero recibir y descargar mis entradas (P0) | Correo de confirmación recibido con enlace seguro; login de la cuenta correcta abre entradas; descarga/impresión conservan QR legible; fallo de correo no duplica compra; soporte puede resolver falta de entrega | I/B correo; procedimiento de reenvío pendiente |
+| HU-11 | Como personal quiero validar el ingreso (P0) | Equipo aprobado lee QR real en HTTPS; válido autoriza; segundo intento, otro evento, anulado y desconocido rechazan; muestra resultado inequívoco; registra operador y hora | I/V dispositivos |
+| HU-12 | Como organizador quiero múltiples equipos sin duplicar admisiones (P0) | Dos lecturas simultáneas de la misma entrada producen exactamente una admisión; siguiente QR funciona sin recargar; detener/reiniciar cámara no procesa resultados atrasados | I/V físico; regresión cámara añadida |
+| HU-13 | Como propietario quiero permisos y reportes fiables (P0) | Comprador no administra; staff solo valida su organización; no ve ventas ajenas; cifras corresponden a pedidos reales, no a DEMO; revocación probada | I/V aceptación operativa |
+| HU-14 | Como soporte quiero resolver incidentes de venta (P0) | Referencia permite conciliar sin revelar QR; pago sin entrada, correo fallido y duplicidad tienen responsable/procedimiento; devolución se comprueba antes de anular según regla acordada | Parcial/V procedimiento |
+| HU-15 | Como operador quiero servicio público recuperable (P0) | Hostinger ejecuta runtime compatible con disco persistente; HTTPS, proceso reiniciable, respaldo externo restaurado y alertas comprobadas; actualizar no pierde pedidos | B infraestructura |
+| HU-16 | Como comprador quiero claridad antes de comprar (P0) | Horario, ubicación, tipo, importe total y restricciones visibles; soporte y cancelación definidos; decidir transferible/nominativo y reingreso; no mostrar condiciones inventadas | B propietario |
+
+No se requieren cuentas de tiendas móviles para vender desde la web. No se implementa un QR falso ni un botón de pago simulado como sustituto de aceptación.
+
+| HU-17 | Como propietario de SharkPass quiero administración global (P0) | Rol separado de owner/scanner; registro nunca lo asigna; comprobar permiso en cada API; panel de usuarios/organizaciones/eventos/pedidos/auditoría; contraseña y motivo para moderar/cerrar sesiones; no exponer hashes/QR; activación privada y revocación auditadas | Implementado;39pruebas del conjunto aprobadas; pendiente activar cuenta del propietario y verificar acceso real con ella |

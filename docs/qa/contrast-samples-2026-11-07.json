@@ -1,0 +1,82 @@
+{
+  "note": "Muestras que pasaron tras correcciones. Los hallazgos previos y el alcance de la matriz están en el informe. La URL de cuenta reúne perfiles y formularios distintos. No es certificación completa de accesibilidad.",
+  "samples": [
+    {
+      "checked": 52,
+      "failures": [],
+      "overflow": false,
+      "url": "/?view=cart",
+      "width": 1280
+    },
+    {
+      "checked": 49,
+      "failures": [],
+      "overflow": false,
+      "url": "/?view=checkout",
+      "width": 1280
+    },
+    {
+      "checked": 53,
+      "failures": [],
+      "overflow": false,
+      "url": "/?payment=1ef59dbb-a665-483a-ba73-e06acd410e9f",
+      "width": 1280
+    },
+    {
+      "checked": 82,
+      "failures": [],
+      "overflow": false,
+      "url": "/",
+      "width": 1280
+    },
+    {
+      "checked": 28,
+      "failures": [],
+      "overflow": false,
+      "url": "/?view=account&auth=register",
+      "width": 1280
+    },
+    {
+      "checked": 27,
+      "failures": [],
+      "overflow": false,
+      "url": "/?view=account",
+      "width": 1280
+    },
+    {
+      "checked": 20,
+      "failures": [],
+      "overflow": false,
+      "url": "/?view=account",
+      "width": 320
+    },
+    {
+      "checked": 28,
+      "failures": [],
+      "overflow": false,
+      "url": "/?view=orders",
+      "width": 1280
+    },
+    {
+      "checked": 31,
+      "failures": [],
+      "overflow": false,
+      "url": "/?order=8f2c20c8-b3e6-4978-a264-8499b50a4c18",
+      "width": 934
+    },
+    {
+      "checked": 78,
+      "failures": [],
+      "overflow": false,
+      "url": "/",
+      "width": 320
+    },
+    {
+      "checked": 48,
+      "failures": [],
+      "overflow": false,
+      "url": "/?view=cart",
+      "width": 320
+    }
+  ]
+}

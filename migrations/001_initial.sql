@@ -1,0 +1,11 @@
+CREATE TABLE users(id TEXT PRIMARY KEY,username TEXT NOT NULL COLLATE NOCASE UNIQUE,password_hash TEXT NOT NULL,created_at TEXT NOT NULL);
+CREATE TABLE sessions(token_hash TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,expires_at INTEGER NOT NULL);
+CREATE TABLE organizations(id TEXT PRIMARY KEY,name TEXT NOT NULL,owner_id TEXT NOT NULL REFERENCES users(id));
+CREATE TABLE members(organization_id TEXT NOT NULL REFERENCES organizations(id),user_id TEXT NOT NULL REFERENCES users(id),role TEXT NOT NULL CHECK(role IN ('owner','scanner')),PRIMARY KEY(organization_id,user_id));
+CREATE TABLE events(id TEXT PRIMARY KEY,organization_id TEXT NOT NULL REFERENCES organizations(id),title TEXT NOT NULL,description TEXT NOT NULL,venue TEXT NOT NULL,starts_at TEXT NOT NULL,state TEXT NOT NULL CHECK(state IN ('draft','published','cancelled')),is_demo INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE ticket_types(id TEXT PRIMARY KEY,event_id TEXT NOT NULL REFERENCES events(id),name TEXT NOT NULL,price_cop INTEGER NOT NULL CHECK(price_cop>=0),capacity INTEGER NOT NULL CHECK(capacity BETWEEN 1 AND 100000),UNIQUE(event_id,name));
+CREATE TABLE orders(id TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id),event_id TEXT NOT NULL REFERENCES events(id),type_id TEXT NOT NULL REFERENCES ticket_types(id),quantity INTEGER NOT NULL CHECK(quantity BETWEEN 1 AND 6),state TEXT NOT NULL CHECK(state IN ('confirmed','cancelled')),total_cop INTEGER NOT NULL CHECK(total_cop>=0),idempotency_key TEXT NOT NULL,request_hash TEXT NOT NULL,created_at TEXT NOT NULL,UNIQUE(user_id,idempotency_key));
+CREATE TABLE tickets(id TEXT PRIMARY KEY,order_id TEXT NOT NULL REFERENCES orders(id),token TEXT NOT NULL UNIQUE,status TEXT NOT NULL CHECK(status IN ('valid','used','void')),used_at TEXT,used_by TEXT REFERENCES users(id));
+CREATE INDEX tickets_order ON tickets(order_id);
+CREATE INDEX orders_event_type ON orders(event_id,type_id,state);
+CREATE TABLE audit(id TEXT PRIMARY KEY,actor_id TEXT NOT NULL REFERENCES users(id),action TEXT NOT NULL,event_id TEXT,created_at TEXT NOT NULL);

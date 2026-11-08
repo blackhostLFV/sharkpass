@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "SharkPass",
+    "slug": "sharkpass",
+    "version": "0.1.0",
+    "scheme": "sharkpass",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sharkpass.app"
+    },
+    "android": {
+      "predictiveBackGestureEnabled": true,
+      "package": "com.sharkpass.app"
+    },
+    "web": {
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-image",
+      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0d0d0d",
+          "image": "./assets/icon.png",
+          "imageWidth": 96
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "icon": "./assets/icon.png"
+  }
+}

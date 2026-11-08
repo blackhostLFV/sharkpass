@@ -1,0 +1,122 @@
+[
+  {
+    "dates": [
+      {
+        "fits": true,
+        "height": 39.59375,
+        "text": "18 de noviembre de 2026 a las 6:00 p. m.",
+        "visible": true
+      },
+      {
+        "fits": true,
+        "height": 39.59375,
+        "text": "19 de noviembre de 2026 a las 6:00 p. m.",
+        "visible": true
+      }
+    ],
+    "overflow": false,
+    "touch": [
+      {
+        "height": 44,
+        "text": "☰Menú",
+        "width": 80.8515625
+      },
+      {
+        "height": 45,
+        "text": "Carrito 0",
+        "width": 93.140625
+      },
+      {
+        "height": 44,
+        "text": "Ver evento",
+        "width": 101.6484375
+      },
+      {
+        "height": 44,
+        "text": "Ver evento",
+        "width": 101.6484375
+      }
+    ],
+    "width": 320
+  },
+  {
+    "dates": [
+      {
+        "fits": true,
+        "height": 19.796875,
+        "text": "18 de noviembre de 2026 a las 6:00 p. m.",
+        "visible": true
+      },
+      {
+        "fits": true,
+        "height": 19.796875,
+        "text": "19 de noviembre de 2026 a las 6:00 p. m.",
+        "visible": true
+      }
+    ],
+    "overflow": false,
+    "touch": [
+      {
+        "height": 44,
+        "text": "☰Menú",
+        "width": 84.8515625
+      },
+      {
+        "height": 45,
+        "text": "Carrito 0",
+        "width": 97.140625
+      },
+      {
+        "height": 44,
+        "text": "Ver evento",
+        "width": 101.6484375
+      },
+      {
+        "height": 44,
+        "text": "Ver evento",
+        "width": 101.6484375
+      }
+    ],
+    "width": 390
+  },
+  {
+    "dates": [
+      {
+        "fits": true,
+        "height": 19.796875,
+        "text": "18 de noviembre de 2026 a las 6:00 p. m.",
+        "visible": true
+      },
+      {
+        "fits": true,
+        "height": 19.796875,
+        "text": "19 de noviembre de 2026 a las 6:00 p. m.",
+        "visible": true
+      }
+    ],
+    "overflow": false,
+    "touch": [
+      {
+        "height": 44,
+        "text": "☰Menú",
+        "width": 84.8515625
+      },
+      {
+        "height": 45,
+        "text": "Carrito 0",
+        "width": 97.140625
+      },
+      {
+        "height": 44,
+        "text": "Ver evento",
+        "width": 101.6484375
+      },
+      {
+        "height": 44,
+        "text": "Ver evento",
+        "width": 101.6484375
+      }
+    ],
+    "width": 430
+  }
+]
