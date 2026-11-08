@@ -95,7 +95,7 @@ Consulta [el alcance móvil](apps/mobile/README.md). Una exportación de iOS/And
 npm run check
 npm run build
 docker build -t sharkpass .
-docker run --rm -p 127.0.0.1:3201:3000 sharkpass
+docker run --rm -p 127.0.0.1:3201:3000 -e PUBLIC_URL=http://localhost:3201 sharkpass
 ```
 
 La base del contenedor sin volumen es temporal. Para persistencia, montar un volumen en `/data` con permisos del usuario `node`.
