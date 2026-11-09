@@ -20,3 +20,14 @@ test('reservation countdown uses server time, does not restart on reload, and ne
  assert.equal(remainingReservationMs({...p,state:'confirmed'}),0);
  assert.equal(remainingReservationMs({...p,serverNow:'bad'}),0);
 });
+
+
+test('seat editing restores available chairs without substituting sold, reserved or other-locality seats',async()=>{
+ const {restoreSeatSelection}=await import('../public/cart-state.js');
+ const event={id:'event',seats:[{id:'one',typeId:'gold',status:'available'},{id:'two',typeId:'gold',status:'sold'},{id:'three',typeId:'gold',status:'reserved'},{id:'four',typeId:'blue',status:'available'}]};
+ const cart={eventId:'event',typeId:'gold',seatIds:['one','two','three','four','missing']};
+ assert.deepEqual(restoreSeatSelection(event,cart),{seatIds:['one'],unavailable:['two','three','four','missing']});
+ assert.deepEqual(cart.seatIds,['one','two','three','four','missing']);
+ assert.deepEqual(restoreSeatSelection({...event,id:'different'},cart),{seatIds:[],unavailable:[]});
+ assert.deepEqual(restoreSeatSelection(event,null),{seatIds:[],unavailable:[]});
+});

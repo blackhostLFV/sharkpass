@@ -26,3 +26,20 @@ test('menu closes for navigation, outside clicks, cart and breakpoint changes; d
  toggle.events.click();doc.events.click({target:cart});assert.equal(toggle.attrs['aria-expanded'],'false');
  toggle.events.click();media.matches=false;media.events.change();assert.equal(toggle.attrs['aria-expanded'],'false');
 });
+
+
+test('purchase navigation retains event, cart and map history; restoring Back does not create entries',async()=>{
+ const {createRouteHistory}=await import('../public/navigation.js');
+ const entries=['https://example.invalid/'],location={href:entries[0]};let index=0;
+ const win={location,history:{pushState(_s,_t,path){entries.splice(index+1);entries.push(new URL(path,location.href).href);index++;location.href=entries[index];},replaceState(_s,_t,path){entries[index]=new URL(path,location.href).href;location.href=entries[index];}}};
+ const nav=createRouteHistory(win);await nav.restore(async()=>nav.navigate('/'));nav.start();
+ nav.navigate('/evento/event');nav.navigate('/?view=cart');nav.navigate('/?view=cart');
+ assert.equal(entries.length,3);
+ index--;location.href=entries[index];await nav.restore(async()=>{assert.equal(nav.restoring,true);nav.navigate('/?view=cart');});
+ assert.equal(location.href,'https://example.invalid/evento/event');assert.equal(entries.length,3);
+ nav.navigate('/evento/event#seat-picker-title');nav.navigate('/?view=cart');
+ assert.equal(entries.length,4);assert.equal(entries[2],'https://example.invalid/evento/event#seat-picker-title');
+ assert.throws(()=>nav.navigate('https://external.invalid/'),/SharkPass/);
+ await assert.rejects(nav.restore(async()=>{throw new Error('Synthetic network failure');}));assert.equal(nav.restoring,false);
+ nav.navigate('/?view=checkout');assert.equal(entries.length,5);
+});

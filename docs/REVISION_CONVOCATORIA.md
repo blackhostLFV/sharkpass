@@ -33,7 +33,7 @@ Estado: 8 de noviembre de 2026. Repositorio público para evaluación técnica. 
 
 ## Evidencia reproducible
 
-Con Node 22.17.1: `npm ci`, `npm run check` y `npm run build`. La revisión actual pasó 100 pruebas; el build exporta los clientes Expo y comprueba sintaxis del servidor. Hay una prueba HTTP concurrente que permite una compra por silla, y una prueba de migración que preserva entradas previas tras crear y abrir un respaldo independiente.
+Con Node 22.17.1: `npm ci`, `npm run check` y `npm run build`. La revisión actual pasó 102 pruebas; el build exporta los clientes Expo y comprueba sintaxis del servidor. Hay una prueba HTTP concurrente que permite una compra por silla, y una prueba de migración que preserva entradas previas tras crear y abrir un respaldo independiente.
 
 Los escenarios de pago en pruebas usan datos y adaptadores sintéticos. No demuestran por sí solos aprobación comercial, entrega a todos los proveedores de correo o rendimiento de un recinto en operación.
 

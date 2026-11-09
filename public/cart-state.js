@@ -18,3 +18,12 @@ export function formatReservation(ms) {
   const seconds = Math.max(0, Math.ceil(ms / 1000));
   return `${String(Math.floor(seconds / 60)).padStart(2,"0")}:${String(seconds % 60).padStart(2,"0")}`;
 }
+
+// Restore only available chairs from this event and locality; never guess a substitute.
+export function restoreSeatSelection(event,cart){
+ if(!cart?.seatIds||cart.eventId!==event.id)return {seatIds:[],unavailable:[]};
+ const seats=new Map(event.seats.map(seat=>[seat.id,seat]));
+ const available=[],unavailable=[];
+ for(const id of cart.seatIds){const seat=seats.get(id);if(seat?.typeId===cart.typeId&&seat.status==='available')available.push(id);else unavailable.push(id);}
+ return {seatIds:available.slice(0,6),unavailable};
+}

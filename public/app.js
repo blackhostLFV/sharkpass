@@ -1,12 +1,13 @@
 import {summarizePricing} from "/pricing.js?v=20261108-iva19";
 import {mountOrganizerLanding} from "/organizers.js?v=20261107-organizers-v5";
-import {mountSeatPicker} from "/seating.js?v=20261108-iva19";
+import {mountSeatPicker} from "/seating.js?v=20261109-cart-back";
 import {mountAdminConsole} from "/admin-console.js?v=20261107-console";
-import {setupMobileNavigation} from "/navigation.js?v=20261107-mobile-nav";
+import {setupMobileNavigation,createRouteHistory} from "/navigation.js?v=20261109-cart-back";
 import { demoEvents } from "/demo-events.js";
-import {parseCart,sameSelection,remainingReservationMs,formatReservation} from "/cart-state.js?v=20261107-checkout";
+import {parseCart,sameSelection,remainingReservationMs,formatReservation} from "/cart-state.js?v=20261109-cart-back";
 
-const params = new URLSearchParams(location.search);
+let params = new URLSearchParams(location.search);
+const routeHistory=createRouteHistory(window);
 const previewMode = params.get("demo") === "1";
 const content = document.querySelector("#content"),
   message = document.querySelector("#message");
@@ -386,7 +387,7 @@ async function events() {
       target.searchParams.delete("q");target.searchParams.delete("category");
       if(search.elements.query.value.trim())target.searchParams.set("q",search.elements.query.value.trim());
       if(category.value)target.searchParams.set("category",category.value);
-      history.replaceState(null,"",target.pathname+target.search);
+      routeHistory.navigate(target.pathname+target.search,{replace:true});
     }
     const query = normalize(search.elements.query.value.trim());
     const found = items.filter(
@@ -521,7 +522,7 @@ function previewEventDetail(id) {
     return;
   }
   document.body.dataset.view = "detail";
-  history.replaceState(null, "", `/?demo=1&event=${event.id}`);
+  routeHistory.navigate(`/?demo=1&event=${event.id}`);
   content.replaceChildren();
   const back = button(
     "← Explorar los ejemplos",
@@ -711,6 +712,12 @@ function emptyCart(){
   empty.append(el("span","01",{class:"checkout-empty-mark","aria-hidden":"true"}),el("h2","Aún no has elegido tus entradas"),el("p","Explora los eventos y añade la localidad y la cantidad que quieras."),button("Explorar eventos",()=>show("events")));
   content.append(empty);
 }
+async function editCartSeats(eventId){
+  const current=basket;
+  if(!current?.seatIds||current.eventId!==eventId)return eventDetail(eventId);
+  // Refresh and request consent before releasing a live payment; keep selected IDs.
+  if(await changeBasket(current))await eventDetail(eventId,false,{editSeats:true});
+}
 async function cartScreen(){
   if(!basket)return emptyCart();
   let ctx;
@@ -721,7 +728,7 @@ async function cartScreen(){
   }
   if(ctx.payment?.state==="confirmed")return paymentDetail(ctx.payment.id);
   heading("Tu carrito","Revisa la localidad y la cantidad antes de continuar.");
-  content.append(checkoutSteps(1));
+  content.append(button(basket.seatIds?"Atrás · Añadir o cambiar sillas":"Atrás · Ver entradas",()=>basket.seatIds?editCartSeats(ctx.event.id):eventDetail(ctx.event.id),"cart-back"),checkoutSteps(1));
   const layout=el("div",null,{class:"checkout-layout"}),main=el("section",null,{class:"checkout-main"});
   const item=el("article",null,{class:"cart-item"});
   if(ctx.event.image)item.append(el("img",null,{src:ctx.event.image,alt:`Portada de ${ctx.event.title}`,class:"cart-poster"}));
@@ -735,15 +742,18 @@ async function cartScreen(){
     try{const next=ctx.event.types.find(t=>t.id===select.value);if(await changeBasket({eventId:ctx.event.id,typeId:next.id,quantity:Math.min(basket.quantity,Math.max(1,next.available))}))await show("cart");}
     catch(error){select.value=ctx.type.id;
   if(basket.seatIds)select.disabled=true;inform(error.message);}
-  });label.append(select);body.append(label);
-  const quantity=el("div",null,{class:"cart-quantity","aria-label":"Cantidad de entradas"});
-  const setQuantity=async value=>{if(await changeBasket({...basket,quantity:value}))await show("cart");};
-  const minus=button("−",()=>setQuantity(basket.quantity-1),"quantity-button");minus.setAttribute("aria-label","Disminuir cantidad");minus.disabled=basket.quantity<=1;
-  const count=el("span",String(basket.quantity),{"aria-label":`${basket.quantity} ${basket.quantity===1?"entrada":"entradas"}`});
-  const plus=button("+",()=>setQuantity(basket.quantity+1),"quantity-button");plus.setAttribute("aria-label","Aumentar cantidad");plus.disabled=basket.quantity>=Math.min(6,ctx.available);
-  quantity.append(minus,count,plus,el("span",pricingText(ctx.type.pricing,1,ctx.payment?.state==="pending"?ctx.payment.totalCop/ctx.payment.quantity:ctx.type.price_cop),{class:"quantity-price"}));
-  if(basket.seatIds){minus.disabled=true;plus.disabled=true;body.append(el("p",`Sillas: ${ctx.event.seats.filter(seat=>basket.seatIds.includes(seat.id)).map(seat=>seat.row+seat.number).join(", ")}`,{class:"cart-seat-labels"}),button("Cambiar sillas",async()=>{if(await changeBasket(null))await eventDetail(ctx.event.id);},"secondary"));}
-  body.append(quantity,button("Eliminar del carrito",async()=>{if(await changeBasket(null))await show("cart");},"text-button cart-remove"));item.append(body);main.append(item);
+  });label.append(select);if(basket.seatIds)body.append(el("p",ctx.type.name,{class:"cart-locality"}));else body.append(label);
+  if(basket.seatIds){
+    body.append(el("p",`${basket.quantity} ${basket.quantity===1?"entrada seleccionada":"entradas seleccionadas"}`,{class:"cart-seat-count"}),el("p",`Sillas: ${ctx.event.seats.filter(seat=>basket.seatIds.includes(seat.id)).map(seat=>seat.row+seat.number).join(", ")}`,{class:"cart-seat-labels"}),el("p","Cada entrada corresponde a una silla. Para añadir más o cambiar tu ubicación, vuelve al mapa.",{class:"cart-seat-help"}),button("Añadir o cambiar sillas",()=>editCartSeats(ctx.event.id),"secondary cart-edit-seats"));
+  }else{
+    const quantity=el("div",null,{class:"cart-quantity","aria-label":"Cantidad de entradas"});
+    const setQuantity=async value=>{if(await changeBasket({...basket,quantity:value}))await show("cart");};
+    const minus=button("−",()=>setQuantity(basket.quantity-1),"quantity-button");minus.setAttribute("aria-label","Disminuir cantidad");minus.disabled=basket.quantity<=1;
+    const count=el("span",String(basket.quantity),{"aria-label":`${basket.quantity} ${basket.quantity===1?"entrada":"entradas"}`});
+    const plus=button("+",()=>setQuantity(basket.quantity+1),"quantity-button");plus.setAttribute("aria-label","Aumentar cantidad");plus.disabled=basket.quantity>=Math.min(6,ctx.available);
+    quantity.append(minus,count,plus);body.append(quantity);
+  }
+  body.append(el("p",pricingText(ctx.type.pricing,1,ctx.payment?.state==="pending"?ctx.payment.totalCop/ctx.payment.quantity:ctx.type.price_cop),{class:"quantity-price"}),button("Eliminar del carrito",async()=>{if(await changeBasket(null))await show("cart");},"text-button cart-remove"));item.append(body);main.append(item);
   main.append(el("p","Puedes comprar hasta 6 entradas de una localidad por pedido.",{class:"checkout-fine-print"}));
   const sufficient=ctx.available>=basket.quantity;
   if(!sufficient)main.append(el("p","La disponibilidad cambió. Reduce la cantidad o elige otra localidad.",{class:"checkout-callout"}));
@@ -769,7 +779,7 @@ async function checkoutScreen(){
   try{ctx=await cartContext();}catch(error){if(error.status===404)return cartScreen();throw error;}
   if(ctx.payment && !["expired","failed","voided"].includes(ctx.payment.state))return paymentDetail(ctx.payment.id);
   if(ctx.payment){saveBasket({...basket,key:crypto.randomUUID(),paymentId:undefined});}
-  heading("Completa tu compra","Tus entradas llegarán al correo que indiques aquí.");content.append(checkoutSteps(2));
+  heading("Completa tu compra","Tus entradas llegarán al correo que indiques aquí.");content.append(button("Atrás · Volver al carrito",()=>show("cart"),"cart-back"),checkoutSteps(2));
   const layout=el("div",null,{class:"checkout-layout"}),main=el("section",null,{class:"checkout-main"});
   const profile=await request("account/profile"),paid=ctx.type.price_cop>0;
   const f=form(async data=>{
@@ -815,12 +825,12 @@ async function checkoutScreen(){
   mobileBar.append(amount,mobileNext);content.append(mobileBar);
 }
 
-async function eventDetail(id,adminPreview=false) {
+async function eventDetail(id,adminPreview=false,{editSeats=false}={}) {
   if(previewMode)return previewEventDetail(id);
   stopCheckoutTimers();
   const event=await request(adminPreview?`admin/events/${id}/preview`:`events/${id}`);
   heading(event.title,event.category??"Encuentra tu próximo momento");
-  document.body.dataset.view="detail";history.replaceState(null,"",adminPreview?`/?previewEvent=${id}`:`/evento/${id}`);
+  document.body.dataset.view="detail";routeHistory.navigate(adminPreview?`/?previewEvent=${id}`:`/evento/${id}${editSeats?"#seat-picker-title":""}`);
   const layout=el("div",null,{class:"purchase-event-layout"}),story=el("section",null,{class:"purchase-event-story"});
   if(event.image)story.append(el("img",null,{src:event.image,alt:`Portada de ${event.title}`,class:"purchase-event-poster"}));
   const facts=el("dl",null,{class:"event-purchase-facts"});
@@ -834,7 +844,23 @@ async function eventDetail(id,adminPreview=false) {
   else if(event.seats?.length){
     purchase.append(el("p","Escoge tus puestos en el mapa. Un QR por silla y un solo ingreso por entrada.",{class:"checkout-fine-print"}));
     const availability=el("dl",null,{class:"seated-availability"});for(const type of event.types)availability.append(el("dt",type.name),el("dd",`${pricingText(type.pricing)} · ${type.available} disponibles`));purchase.append(availability,el("p","Precio base e IVA detallados por entrada. Sin cargos de servicio adicionales. Únicamente ingreso al evento.",{class:"checkout-fine-print"}),button("Elegir mis sillas",()=>{const target=story.querySelector(".seat-picker");target.scrollIntoView({block:"start",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});target.querySelector(".seat-map-scroll").focus({preventScroll:true});},"checkout-primary"));
-    mountSeatPicker(story,event,{el,button,money,onChoose:async(type,seatIds)=>{if(adminPreview)throw new Error("Vista previa: la venta aún no está habilitada.");if(await changeBasket({eventId:event.id,typeId:type.id,quantity:seatIds.length,seatIds}))await show("cart");}});
+    const selectedCart=basket?.eventId===event.id&&basket.seatIds?basket:null;
+    const held=selectedCart&&!adminPreview?await cartPayment():null;
+    const locked=held&&!["expired","failed","voided"].includes(held.state);
+    if(selectedCart){
+      story.append(button("Volver al carrito sin cambios",()=>show("cart"),"secondary seat-return-cart"));
+      if(locked)story.append(el("p","Tu compra tiene una reserva o un pago en curso. Para cambiar sillas, vuelve al carrito y pulsa «Añadir o cambiar sillas». Comprobaremos el pago antes de liberar los puestos.",{class:"checkout-callout"}));
+    }
+    mountSeatPicker(story,event,{el,button,money,cart:selectedCart,readOnly:Boolean(locked),onChoose:async(type,seatIds)=>{
+      if(adminPreview)throw new Error("Vista previa: la venta aún no está habilitada.");
+      const next={eventId:event.id,typeId:type.id,quantity:seatIds.length,seatIds};
+      if(sameSelection(basket,{event:{id:event.id},type,quantity:seatIds.length,seatIds}))return show("cart");
+      if(await changeBasket(next))await show("cart");
+    }});
+    if(editSeats||(routeHistory.restoring&&selectedCart)){
+      // Scroll after the map has been attached to the document below.
+      story.dataset.focusSeats="true";
+    }
   }
   else{
     const f=form(async data=>{
@@ -867,6 +893,7 @@ async function eventDetail(id,adminPreview=false) {
   }
   if(event.is_demo)purchase.append(el("a","Probar mapa de asientos →",{href:"/asientos-demo.html",class:"seat-demo-link"}),el("p","Demo visual independiente. No reserva puestos ni modifica esta compra.",{class:"checkout-fine-print"}));
   layout.append(story,purchase);content.append(checkoutSteps(0),layout,button("Explorar otros eventos",()=>show("events"),"secondary back-link"));
+  if(story.dataset.focusSeats){const map=story.querySelector(".seat-map-scroll");map?.scrollIntoView({block:"start",behavior:"instant"});map?.focus({preventScroll:true});}
 }
 
 function accountIcon(name){
@@ -973,7 +1000,7 @@ function authScreen(mode = "login") {
     if(mode==="register")target.set("auth","register");
     for(const name of ["payment","order","previewEvent"]){const value=params.get(name);if(value&&/^[a-f0-9-]{36}$/i.test(value))target.set(name,value);}
     const provider=params.get("id");if(target.has("payment")&&provider&&/^[a-zA-Z0-9-]{1,100}$/.test(provider))target.set("id",provider);
-    history.replaceState(null,"",`/?${target}`);
+    routeHistory.navigate(`/?${target}`,{replace:checkoutReturn});
   }
   document.body.dataset.auth = "true";
   const register = mode === "register",
@@ -1015,7 +1042,7 @@ function authScreen(mode = "login") {
       if(params.get("previewEvent"))await eventDetail(params.get("previewEvent"),true);
       else if (params.get("payment")) await paymentDetail(params.get("payment"));
       else if (params.get("order")) await orderDetail(params.get("order"));
-      else if (checkoutReturn && basket) {setCheckoutReturn(false);await show("checkout");}
+      else if (checkoutReturn && basket) {setCheckoutReturn(false);routeHistory.navigate("/?view=checkout",{replace:true});await show("checkout");}
       else if (returnEvent) await eventDetail(returnEvent);
       else await show("account");
       inform(register ? "Cuenta creada." + verificationMessage : "Sesión iniciada.");
@@ -1159,7 +1186,7 @@ function authScreen(mode = "login") {
     document.body.dataset.checkoutAuth="true";
     const panel=el("section",null,{class:"checkout-login-panel"});
     while(content.firstChild)panel.append(content.firstChild);
-    panel.prepend(checkoutSteps(2),el("p","Tu selección está guardada. Entra o crea tu cuenta para continuar.",{class:"checkout-callout"}));
+    panel.prepend(button("Atrás · Volver al carrito",()=>show("cart"),"cart-back"),checkoutSteps(2),el("p","Tu selección está guardada. Entra o crea tu cuenta para continuar.",{class:"checkout-callout"}));
     const story=el("aside",null,{class:"checkout-login-story"});
     story.append(el("img",null,{src:"/media/sharkpass-concert-hero-hd.webp",alt:"Concierto iluminado en azul, imagen ilustrativa"}),el("div",null,{class:"checkout-login-shade"}));
     const copy=el("div",null,{class:"checkout-login-copy"});copy.append(el("p","SHARKPASS",{class:"eyebrow"}),el("h2","Una cuenta. Todos tus momentos."),el("p","Conserva tus compras y encuentra tus entradas en un solo lugar."));story.append(copy);
@@ -1229,7 +1256,7 @@ function openTicketViewer(order,index){
 async function orderDetail(id) {
   if (authRequired()) return;
   const order = await request(`orders/${id}`);
-  history.replaceState(null, "", `/?order=${id}`);
+  routeHistory.navigate(`/?order=${id}`);
   heading(order.state==="confirmed"?"Tus entradas, listas para vivirlo":"Estado de tus entradas","Guarda tus boletas y presenta el QR de cada persona al ingresar.");
   document.body.dataset.view="checkout";delete document.body.dataset.auth;content.classList.add("ticket-wallet");
   content.append(button("← Mis entradas",()=>show("orders"),"wallet-back"));
@@ -1720,7 +1747,7 @@ async function paymentDetail(id) {
   }
   heading(payment.state==="pending"?"Completa tu pago":paymentLabels[payment.state]??"Tu pago","Revisa tu reserva y completa el pago de tus entradas.");
   document.body.dataset.view="checkout";delete document.body.dataset.auth;
-  history.replaceState(null,"",`/?payment=${id}${providerId?`&id=${encodeURIComponent(providerId)}`:""}`);
+  routeHistory.navigate(`/?payment=${id}${providerId?`&id=${encodeURIComponent(providerId)}`:""}`);
   content.append(checkoutSteps(3));
   const layout=el("div",null,{class:"checkout-layout"}),main=el("section",null,{class:"checkout-main payment-main"});
   if(payment.environment==="test")main.append(el("p","WOMPI SANDBOX · PRUEBA SIN DINERO REAL",{class:"checkout-callout"}));
@@ -1778,7 +1805,7 @@ function accountLink(purpose, token) {
     purpose === "verify" ? "Verificar correo" : "Recuperar cuenta",
     "Este enlace es temporal y de un solo uso.",
   );
-  history.replaceState(null, "", "/");
+  routeHistory.navigate("/");
   const f = form(
     async (data) => {
       await request(
@@ -1842,10 +1869,7 @@ async function show(next) {
     if (item.dataset.view === view) item.setAttribute("aria-current", "page");
     else item.removeAttribute("aria-current");
   }
-  history.replaceState(
-    null,
-    "",
-    previewMode
+  routeHistory.navigate(previewMode
       ? `/?demo=1${view === "events" ? "" : `&view=${view}`}`
       : view === "events"
         ? "/"
@@ -1855,7 +1879,7 @@ async function show(next) {
     const target=new URL(location.href),search=document.querySelector("#header-search");
     const query=search.elements.query.value.trim(),category=search.elements.category.value;
     if(query)target.searchParams.set("q",query);if(category)target.searchParams.set("category",category);
-    history.replaceState(null,"",target.pathname+target.search);
+    routeHistory.navigate(target.pathname+target.search,{replace:true});
   }
   inform("");
   try {
@@ -1917,29 +1941,22 @@ headerSearch.addEventListener("submit",async event=>{
 });
 setupMobileNavigation(document,window);
 updateCartBadge();
-if (previewMode) {
-  document
-    .querySelector("#pilot-notice")
-    .replaceChildren(
-      el(
-        "span",
-        "DEMO VISUAL · Eventos ficticios, sin reservas, pagos ni emisión de entradas.",
-      ),
-      el("a", "Salir de la demo", { href: "/" }),
-    );
-  if (params.get("event")) previewEventDetail(params.get("event"));
-  else void show(view);
-} else {
-  loadMe()
-    .then(() => {
-      const match = location.pathname.match(/^\/evento\/([a-f0-9-]{36})$/);
-      if (params.get("verify"))
-        return accountLink("verify", params.get("verify"));
-      if (params.get("reset")) return accountLink("reset", params.get("reset"));
-      if(params.get("previewEvent")&&/^[a-f0-9-]{36}$/.test(params.get("previewEvent")))return me?eventDetail(params.get("previewEvent"),true):show("account");
-      if (params.get("payment")) return paymentDetail(params.get("payment"));
-      if (params.get("order")) return orderDetail(params.get("order"));
-      return match ? eventDetail(match[1]) : show(view);
-    })
-    .catch((e) => inform(e.message));
+if(previewMode)document.querySelector("#pilot-notice").replaceChildren(el("span","DEMO VISUAL · Eventos ficticios, sin reservas, pagos ni emisión de entradas."),el("a","Salir de la demo",{href:"/"}));
+async function renderCurrentRoute(){
+  params=new URLSearchParams(location.search);
+  authMode=params.get("auth")==="register"?"register":"login";
+  const routeView=params.get("view")??"events";
+  if(previewMode)return params.get("event")?previewEventDetail(params.get("event")):show(routeView);
+  await loadMe();
+  const match=location.pathname.match(/^\/evento\/([a-f0-9-]{36})$/);
+  if(params.get("verify"))return accountLink("verify",params.get("verify"));
+  if(params.get("reset"))return accountLink("reset",params.get("reset"));
+  if(params.get("previewEvent")&&/^[a-f0-9-]{36}$/.test(params.get("previewEvent")))return me?eventDetail(params.get("previewEvent"),true):show("account");
+  if(params.get("payment"))return paymentDetail(params.get("payment"));
+  if(params.get("order"))return orderDetail(params.get("order"));
+  if(match)return eventDetail(match[1],false,{editSeats:location.hash==="#seat-picker-title"});
+  if(routeView==="search")headerSearch.elements.query.value=(params.get("q")??"").slice(0,150);
+  return show(routeView);
 }
+window.addEventListener("popstate",()=>{void routeHistory.restore(renderCurrentRoute).catch(error=>inform(error.message));});
+void routeHistory.restore(renderCurrentRoute).catch(error=>inform(error.message)).finally(()=>routeHistory.start());
